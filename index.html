@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskMate - Student Task Manager</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f7fc;
+      color: #1e293b;
+    }
+
+    header {
+      background: #17324d;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header span {
+      color: #9bc1ff;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 25px auto;
+      padding: 15px;
+    }
+
+    .welcome {
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .card, .panel {
+      background: white;
+      border: 1px solid #e4eaf2;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .stats strong {
+      display: block;
+      font-size: 28px;
+      margin-top: 8px;
+      color: #3478f6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 18px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 12px 0 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d5deea;
+      border-radius: 7px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 13px;
+      border: none;
+      border-radius: 7px;
+      background: #3478f6;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .save {
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .filters button {
+      background: #edf3fc;
+      color: #35516d;
+    }
+
+    .filters button.active {
+      background: #3478f6;
+      color: white;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 13px;
+      margin-top: 10px;
+      border: 1px solid #e4eaf2;
+      border-radius: 9px;
+    }
+
+    .task-info {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .task-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #6c7a89;
+      line-height: 1.5;
+    }
+
+    .task.done .task-title {
+      text-decoration: line-through;
+    }
+
+    .task.done {
+      opacity: 0.65;
+    }
+
+    .actions {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .complete {
+      background: #21a675;
+    }
+
+    .delete {
+      background: #fceaea;
+      color: #b42318;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 25px 5px;
+      color: #6c7a89;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #6c7a89;
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .task {
+        align-items: flex-start;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Task<span>Mate</span> 🎓</h1>
+    <p>A Simple Student Task Manager</p>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h2>Stay on Top of Your Schoolwork</h2>
+      <p>Add assignments, set due dates, and track your progress.</p>
+    </section>
+
+    <section class="stats">
+      <div class="card">
+        Total Tasks
+        <strong id="total">0</strong>
+      </div>
+
+      <div class="card">
+        Pending
+        <strong id="pending">0</strong>
+      </div>
+
+      <div class="card">
+        Completed
+        <strong id="completed">0</strong>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>Create a Task</h2>
+
+        <form id="taskForm">
+          <label for="taskName">Task Title</label>
+          <input id="taskName" maxlength="80"
+                 placeholder="Enter task title" required>
+
+          <label for="subject">Subject</label>
+          <input id="subject" maxlength="50"
+                 placeholder="Enter subject" required>
+
+          <label for="dueDate">Due Date</label>
+          <input id="dueDate" type="date" required>
+
+          <label for="priority">Priority</label>
+          <select id="priority">
+            <option>Medium</option>
+            <option>High</option>
+            <option>Low</option>
+          </select>
+
+          <button class="save" type="submit">Save Task</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>My Tasks</h2>
+
+        <div class="filters">
+          <button class="active" data-filter="all">All</button>
+          <button data-filter="pending">Pending</button>
+          <button data-filter="completed">Completed</button>
+        </div>
+
+        <div id="taskList"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    TaskMate - Plan Smarter, Study Better.
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    let tasks = [];
+
+    try {
+      tasks = JSON.parse(
+        localStorage.getItem("taskmate-tasks") || "[]"
+      );
+
+      if (!Array.isArray(tasks)) {
+        tasks = [];
+      }
+    } catch (error) {
+      tasks = [];
+    }
+
+    let filter = "all";
+
+    function saveTasks() {
+      try {
+        localStorage.setItem(
+          "taskmate-tasks",
+          JSON.stringify(tasks)
+        );
+      } catch (error) {
+        alert("Unable to save tasks in this browser.");
+      }
+
+      renderTasks();
+    }
+
+    function renderTasks() {
+      $("total").textContent = tasks.length;
+
+      $("pending").textContent =
+        tasks.filter(task => !task.done).length;
+
+      $("completed").textContent =
+        tasks.filter(task => task.done).length;
+
+      const list = $("taskList");
+      list.replaceChildren();
+
+      const shown = tasks
+        .filter(task =>
+          filter === "all" ||
+          (filter === "pending" && !task.done) ||
+          (filter === "completed" && task.done)
+        )
+        .sort((a, b) => a.due.localeCompare(b.due));
+
+      if (shown.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No tasks yet. Add your first task!";
+        list.appendChild(empty);
+        return;
+      }
+
+      shown.forEach(task => {
+        const item = document.createElement("div");
+        item.className = "task" + (task.done ? " done" : "");
+
+        const info = document.createElement("div");
+        info.className = "task-info";
+
+        const title = document.createElement("div");
+        title.className = "task-title";
+        title.textContent = task.title;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent =
+          task.subject + " | Due: " + task.due +
+          " | " + task.priority + " priority";
+
+        info.append(title, meta);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const complete = document.createElement("button");
+        complete.className = "complete";
+        complete.textContent = task.done ? "Undo" : "Done";
+
+        complete.onclick = () => {
+          task.done = !task.done;
+          saveTasks();
+        };
+
+        const remove = document.createElement("button");
+        remove.className = "delete";
+        remove.textContent = "Delete";
+
+        remove.onclick = () => {
+          tasks = tasks.filter(t => t.id !== task.id);
+          saveTasks();
+        };
+
+        actions.append(complete, remove);
+        item.append(info, actions);
+        list.appendChild(item);
+      });
+    }
+
+    $("taskForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const title = $("taskName").value.trim();
+      const subject = $("subject").value.trim();
+      const due = $("dueDate").value;
+
+      if (!title || !subject || !due) {
+        alert("Please complete all required fields.");
+        return;
+      }
+
+      tasks.push({
+        id: Date.now(),
+        title: title,
+        subject: subject,
+        due: due,
+        priority: $("priority").value,
+        done: false
+      });
+
+      saveTasks();
+      event.target.reset();
+    });
+
+    document.querySelectorAll("[data-filter]")
+      .forEach(button => {
+        button.addEventListener("click", () => {
+          filter = button.dataset.filter;
+
+          document.querySelectorAll("[data-filter]")
+            .forEach(item => {
+              item.classList.toggle("active", item === button);
+            });
+
+          renderTasks();
+        });
+      });
+
+    renderTasks();
+  </script>
+</body>
+</html>
